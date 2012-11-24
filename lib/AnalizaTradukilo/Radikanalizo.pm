@@ -32,8 +32,11 @@ our @EXPORT = qw( ŝargi_radikaron
                   aldoni_senfinaĵan_vorton
                   ĉu_radiko
                   ĉu_senfinaĵa_vorto
+                  ĉu_antaŭradiko
+                  ĉu_postradiko
                   forviŝi_finaĵon
-                  analizi_radikojn );
+                  analizi_radikojn
+                  rangi_eblan_radikaron );
 
 =head1 NAME
 
@@ -75,10 +78,14 @@ radikojn de vortoj Esperantaj.
 Ĉiu vico en radikar-dosiero devas havi unu el la sekvantajn formojn:
 
     # komento....
-
+    radiko tipo
     radiko tipo vorto
+    radiko tipo vorto antaŭ
+    radiko tipo vorto post
+    radiko tipo antaŭ
+    radiko tipo post
 
-kie C<vorto> ne estas lokokupa vorto.
+kie C<vorto>, C<antaŭ>, kaj C<post> ne estas lokokupa vorto.
 
 =cut
 
@@ -88,6 +95,12 @@ our %radikaro;
 # Malpublika aro de niaj nefinaĵaj vortoj.  La subrutino
 # „ŝargi_radikaron“ ĉi tion plenigos.
 our %vortoj;
+# Malpublika aro de niaj antaŭradikoj.  La subrutino „ŝargi_radikaron“
+# ĉi tion plenigos.
+our %antaŭradikoj;
+# Malpublika aro de niaj postradikoj.  La subrutino „ŝargi_radikaron“
+# ĉi tion plenigos.
+our %postradikoj;
 
 sub ŝargi_radikaron {
     my $dosiero = shift || "data/radikaro";
@@ -98,11 +111,15 @@ sub ŝargi_radikaron {
         || die "Ŝargado de radikaro $dosiero: $!";
     my @vortaj_datoj = <$vortdosiero>;
     for (@vortaj_datoj) {
+        chomp;
         next if /^\s*\#/;       # Komento
-        /^(.+)\s+(.+)\s+((?:vorto)?)$/;
+        next unless /^(\w+)\s+(\w+),((?:\w+,)*)$/;
+        my $radiko = $1;
         # Se senfinaĵa vorto:
-        $vortoj{$1} = undef if (defined($3) && $3 eq 'vorto');
-        $radikaro{$1} = $2;
+        $vortoj{$radiko}       = undef if $3 =~ /vorto,/;
+        $antaŭradikoj{$radiko} = undef if $3 =~ /antaŭ,/;
+        $postradikoj{$radiko}  = undef if $3 =~ /post,/;
+        $radikaro{$radiko}     = $2;
     }
 }
 
@@ -163,6 +180,30 @@ sub ĉu_senfinaĵa_vorto {
     return exists $vortoj{$vorto};
 }
 
+=item B<ĉu_antaŭradiko($kordeto)>
+
+Redonas, ĉu iu donita C<$kordeto> estas antaŭradiko.
+
+=cut
+
+sub ĉu_antaŭradiko {
+    my $kordeto = shift
+        || die "Neniu radiko donita al „ĉu_antaŭradiko“";
+    return exists $antaŭradikoj{$kordeto};
+}
+
+=item B<ĉu_postradiko($kordeto)>
+
+Redonas, ĉu iu donita C<$kordeto> estas postradiko.
+
+=cut
+
+sub ĉu_postradiko {
+    my $kordeto = shift
+        || die "Neniu radiko donita al „ĉu_postradiko“";
+    return exists $postradikoj{$kordeto};
+}
+
 =item B<forviŝi_finaĵon($vorto)>
 
 Redonas strukturon, kiu enhavas la C<$vorto>n sen finaĵo kaj la
@@ -217,13 +258,19 @@ formon:
         originala       => 'amuzo',
         finaĵon         => 'o',
         eblaj_radikaroj => [
-            [
-                am,
-                uz
-            ],
-            [
-                amuz
-            ]
+            {
+                rango => -2,
+                ebla_radikaro => [
+                    am,
+                    uz
+                ]
+            },
+            {
+                rango => -1,
+                ebla_radikaro => [
+                    amuz
+                ]
+            }
         ]
     };
 
@@ -266,6 +313,14 @@ sub analizi_radikojn {
         }
         push $analizo->{'eblaj_radikaroj'}, [$finaĵo_strukturo->[1]]
             if !$ĉu_en_listo;
+
+        # Rangi eblajn radikarojn:
+        my $radikaroj_kun_rangoj = [];
+        foreach my $ebla_radikaro (@{$analizo->{'eblaj_radikaroj'}}) {
+            push($radikaroj_kun_rangoj,
+                 rangi_eblan_radikaron($ebla_radikaro));
+        }
+        $analizo->{'eblaj_radikaroj'} = $radikaroj_kun_rangoj;
     }
 
     return $analizo;
@@ -299,6 +354,84 @@ sub analizi_radikojn_helpilo {
     }
 
     return $lastaj;
+}
+
+=item B<rangi_eblan_radikaron($ebla_radikaro)>
+
+Redonas hakettabelon, kiu enhavas la C<$ebla_radikaro>n kaj rangon pri
+ĝia verŝajneco.  Oni devas kompari rangojn nombre,
+t.e. C<$rango1<$rango2>.
+
+La algoritmo, per kiu la rangojn ĉi tiu subrutino komputas, estas tia:
+
+    +1 se antaŭradiko estas antaŭ normala radiko
+    +1 se postradiko estas post normala radiko
+    -5 se radiko ne sciitas
+    -n por n radikoj en ebla radikaro
+    -1 se postradiko estas antaŭ normal radiko
+    -1 se antaŭradiko estas post normala radiko
+    -2 se postradiko estas antaŭ antaŭradiko
+
+La hakettabelo redononta havas la formon:
+
+    $hakettabelo1 = {
+        rango => -2,
+        ebla_radikaro => [
+            am,
+            uz
+        ]
+    };
+    $hakettabelo2 = {
+        rango => -1
+        ebla_radikaro => [
+            amuz
+        ]
+    };
+
+=cut
+
+sub rangi_eblan_radikaron {
+    my $ebla_radikaro = shift
+        || die "Neniu radikaro donita al „rangi_eblan_radikaron“";
+
+    my $hakettabelo = {
+        rango => -scalar(@$ebla_radikaro), # -n por n radikoj en ebla
+        ebla_radikaro => $ebla_radikaro   # radikaro
+    };
+
+    # Unu el „antaŭ“, „normale“, „post“.
+    my $antaŭa_radikloko = '';
+    foreach my $radiko (@$ebla_radikaro) {
+        my $nuna_radikloko = 'normale'; # samkiel la antaŭa_radikloko
+        $nuna_radikloko = 'antaŭ' if ĉu_antaŭradiko($radiko);
+        $nuna_radikloko = 'post'  if ĉu_postradiko($radiko);
+
+        # -5 se radiko ne sciitas
+        $hakettabelo->{'rango'} -= 5 unless ĉu_radiko($radiko);
+
+        # +1 se antaŭradiko estas antaŭ normala radiko
+        $hakettabelo->{'rango'} += 1
+            if ($nuna_radikloko   eq 'normala' &&
+                $antaŭa_radikloko eq 'antaŭ');
+        # +1 se postradiko estas post normala radiko
+        $hakettabelo->{'rango'} += 1
+            if ($nuna_radikloko   eq 'post' &&
+                $antaŭa_radikloko eq 'normale');
+        # -1 se postradiko estas antaŭ normala radiko
+        $hakettabelo->{'rango'} -= 1
+            if ($nuna_radikloko   eq 'normale' &&
+                $antaŭa_radikloko eq 'post');
+        # -1 se antaŭradiko estas post normala radiko
+        $hakettabelo->{'rango'} -= 1
+            if ($nuna_radikloko   eq 'antaŭ' &&
+                $antaŭa_radikloko eq 'normale');
+        # -2 se antaŭradiko estas post normala radiko
+        $hakettabelo->{'rango'} -= 2
+            if ($nuna_radikloko   eq 'antaŭ' &&
+                $antaŭa_radikloko eq 'post');
+    }
+
+    return $hakettabelo;
 }
 
 =back

@@ -39,7 +39,9 @@ radikanalizilo.pl: Copyright © 2012 Patrick M. Niedzielski.
 Ĉi tiun programon donadis oni SEN IA GARANTIO; tajpu „!g“ vidi detalojn.
 Ĉi tiu programo estas libera softvaro: vin oni permesas redonadi ĝin laŭ
 certaj kondiĉoj; tajpu „!k“ vidi detalojn.  Eliri, tajpu „!e“.  Ricevi
-helpon, tajpu „!h“.
+helpon, tajpu „!h“.  Aldoni radikon, tajpu „!ar“ kaj sekve la radikon
+kaj ĝian tipon.  Aldoni vorton senfinaĵan, tajpu „!av“ kaj sekve la
+vorton kaj ĝian tipon.
 FINO
 }
 
@@ -81,6 +83,16 @@ FINO
     pri_programo;
 }
 
+my @nesciitaj_radikoj = ();
+sub skribi_radikon {
+    my $kordeto = $_[0];
+    unless (ĉu_radiko($_[0])) {
+        $kordeto .= '*';
+        push @nesciitaj_radikoj, $_[0];
+    }
+    return $kordeto;
+}
+
 # Ŝargu la defaŭltan radikar-dosieron.
 ŝargi_radikaron;
 
@@ -91,6 +103,9 @@ while (<>) {
     pri_kondiĉoj if /^!k$/;
     pri_helpo    if /^!h$/;
     last         if /^!e$/;
+
+    aldoni_radikon($1, $2) and next if /^!ar\s+(.+)\s+(.+)/;
+    aldoni_senfinaĵan_vorton($1, $2) and next if /^!av\s+(.+)\s+(.+)/;
 
     print <<'LINEFINO';
 ----------------------------------------------------------------------
@@ -108,19 +123,33 @@ LINEFINO
     }
 
     say 'mi povas analizi ĝin tiel:';
-    my $eblaj_radikaroj = $analizo->{'eblaj_radikaroj'};
-    foreach my $ebla_radikaro (@$eblaj_radikaroj) {
-        print '  - ', $ebla_radikaro->[0];
-        for (1..(scalar(@$ebla_radikaro)-1)) {
-            print ' + ', $ebla_radikaro->[$_];
+
+    # Ordigi ilin:
+    my @eblaj_radikaroj =
+        sort {$a->{'rango'} cmp $b->{'rango'}}
+            @{$analizo->{'eblaj_radikaroj'}};
+
+    foreach my $ebla_radikaro (@eblaj_radikaroj) {
+        print '  - Rango ', $ebla_radikaro->{'rango'}, ":\t";
+        print skribi_radikon($ebla_radikaro->{'ebla_radikaro'}->[0]);
+        for (1..(scalar(@{$ebla_radikaro->{'ebla_radikaro'}})-1)) {
+            print ' + ';
+            print skribi_radikon(
+                $ebla_radikaro->{'ebla_radikaro'}->[$_]);
         }
         say '';
+    }
+
+    if (scalar(@nesciitaj_radikoj)) {
+        say 'Mi ne scias la sekvantajn radikojn:';
+        say "  - $_" foreach (@nesciitaj_radikoj);
     }
 
     print <<'LINEFINO';
 ----------------------------------------------------------------------
 LINEFINO
 } continue {
+    @nesciitaj_radikoj = ();
     inviton;
 }
 
