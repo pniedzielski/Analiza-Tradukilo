@@ -314,6 +314,9 @@ ripari.
 Ĉiu ebla radikaro, kiun ni trovas, havas la saman verŝajnecon, eĉ se
 unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
 
+Numerojn ĝi ne komprenas.  La numer-vortoj sciitas esti radikoj, sed
+la postaj radikoj „opa“, „a“, ktp ne troviĝos.
+
 =head1 AUTHORS
 
 Tiun ĉi subrutinaron skribigis Patrick M. Niedzielski
