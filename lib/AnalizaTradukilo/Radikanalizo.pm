@@ -304,6 +304,8 @@ ripari.
 Ĉiu ebla radikaro, kiun ni trovas, havas la saman verŝajnecon, eĉ se
 unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
 
+Radikojn, kiujn apartiĝis per „o“, ni ne povas analizi.
+
 =head1 AUTHORS
 
 Tiun ĉi modulon skribigis Patrick M. Niedzielski
