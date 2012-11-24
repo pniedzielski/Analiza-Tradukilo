@@ -97,6 +97,8 @@ while (<>) {
 LINEFINO
 
     chomp;
+    $_ = lc;
+
     my $analizo = analizi_radikojn($_);
     print 'Mi ricevis ';
     if ($analizo->{'finaĵo'} eq '') {
