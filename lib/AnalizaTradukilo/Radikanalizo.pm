@@ -3,18 +3,18 @@
 # Analiza Tradukilo: Tradukas de Esperanto al la angla.
 # Copyright © 2012 Patrick M. Niedzielski.
 #
-# Ĉi tiu programo estas libera softvaro: vin oni permesas redonadi ĝin
-# kaj/aŭ ŝanĝi ĝin laŭ la kondiĉoj de la GNU Affero General Public
+# Ĉi tiu subrutinaro estas libera softvaro: vin oni permesas redonadi
+# ĝin kaj/aŭ ŝanĝi ĝin laŭ la kondiĉoj de la GNU Affero General Public
 # License, kiel eldonis la Free Software Foundation, aŭ la versio 3ª
 # de la permisilo, aŭ (se vi volas) iu posta versio.
 #
-# Ĉi tiun programon donadis oni pro tiu espero, ke ĝi estu utila, sed
-# SEN IA GARANTIO; sen eĉ la implica garantio de VENDEBLECO aŭ TAŬGECO
-# POR CERTA CELO.  Vidu la GNU Affero General Public License trovi
-# plie da detaloj.
+# Ĉi tiun subrutinaron donadis oni pro tiu espero, ke ĝi estu utila,
+# sed SEN IA GARANTIO; sen eĉ la implica garantio de VENDEBLECO aŭ
+# TAŬGECO POR CERTA CELO.  Vidu la GNU Affero General Public License
+# trovi plie da detaloj.
 #
 # Vi jam ricevu kopion de la GNU Affero General Public License kun ĉi
-# tiu programo.  Se ne, vidu <http://www.gnu.org/licenses/>.
+# tiu subrutinaro.  Se ne, vidu <http://www.gnu.org/licenses/>.
 
 package AnalizaTradukilo::Radikanalizo;
 
@@ -307,7 +307,7 @@ sub analizi_radikojn_helpilo {
 
 Jam sciitaj problemoj:
 
-Ĉi tiu modulo ne povas analizi vortojn, kiu enhavas nesciitajn
+Ĉi tiu subrutinaro ne povas analizi vortojn, kiu enhavas nesciitajn
 radikojn, inkluzive propajn nomojn.  Mi ne certas, kiel ĉi tiun
 ripari.
 
@@ -316,25 +316,25 @@ unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
 
 =head1 AUTHORS
 
-Tiun ĉi modulon skribigis Patrick M. Niedzielski
+Tiun ĉi subrutinaron skribigis Patrick M. Niedzielski
 C<< <PatrickNiedzielski@gmail.com> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright © 2012 Patrick M. Niedzielski.
 
-Ĉi tiu programo estas libera softvaro: vin oni permesas redonadi ĝin
-kaj/aŭ ŝanĝi ĝin laŭ la kondiĉoj de la GNU Affero General Public
+Ĉi tiu subrutinaro estas libera softvaro: vin oni permesas redonadi
+ĝin kaj/aŭ ŝanĝi ĝin laŭ la kondiĉoj de la GNU Affero General Public
 License, kiel eldonis la Free Software Foundation, aŭ la versio 3ª
 de la permisilo, aŭ (se vi volas) iu posta versio.
 
-Ĉi tiun programon donadis oni pro tiu espero, ke ĝi estu utila, sed
+Ĉi tiun subrutinaron donadis oni pro tiu espero, ke ĝi estu utila, sed
 SEN IA GARANTIO; sen eĉ la implica garantio de VENDEBLECO aŭ TAŬGECO
 POR CERTA CELO.  Vidu la GNU Affero General Public License trovi
 plie da detaloj.
 
 Vi jam ricevu kopion de la GNU Affero General Public License kun ĉi
-tiu programo.  Se ne, vidu L<http://www.gnu.org/licenses/>.
+tiu subrutinaro.  Se ne, vidu L<http://www.gnu.org/licenses/>.
 
 =cut
 
