@@ -26,8 +26,6 @@ use locale ':not_characters';
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
 
-use List::MoreUtils qw( uniq );
-
 use base 'Exporter';
 our @EXPORT = qw( ŝargi_radikaron
                   aldoni_radikon
