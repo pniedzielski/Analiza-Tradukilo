@@ -26,6 +26,8 @@ use locale ':not_characters';
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
 
+use List::MoreUtils qw( uniq );
+
 use base 'Exporter';
 our @EXPORT = qw( ŝargi_radikaron
                   aldoni_radikon
@@ -34,6 +36,8 @@ our @EXPORT = qw( ŝargi_radikaron
                   ĉu_senfinaĵa_vorto
                   forviŝi_finaĵon
                   analizi_radikojn );
+
+use Data::Dumper;
 
 =head1 NAME
 
@@ -276,18 +280,28 @@ sub analizi_radikojn_helpilo {
     my $_ = shift;              # Ne devas „|| die“ ĉi tie.
     return [[]]   if !defined($_);
     return [[]]   if /^$/;      # Se neniom da leteroj.
-    return [[$_]] if /^.$/;     # Se nur unu letero.
     my ($longeco, $pliaj, $lastaj) = (0, [], []);
     for $longeco (1..(length $_)) {
         /^(.{$longeco})(.*)$/;
-        next unless ĉu_radiko($1);
         my $trovita = $1;
+        next unless ĉu_radiko($trovita);
         $pliaj = analizi_radikojn_helpilo($2);
         foreach my $radikoj (@$pliaj) {
-            unshift($radikoj, $trovita);
+            unshift $radikoj, $trovita;
         }
-        push ($lastaj, @$pliaj);
+        push $lastaj, @$pliaj;
     }
+    for $longeco (1..((length $_)-1)) {
+        next unless /^(.{$longeco})o(.*)$/;
+        my $trovita = $1;
+        next unless ĉu_radiko($trovita);
+        $pliaj = analizi_radikojn_helpilo($2);
+        foreach my $radikoj (@$pliaj) {
+            unshift $radikoj, $trovita;
+        }
+        push $lastaj, @$pliaj;
+    }
+
     return $lastaj;
 }
 
@@ -303,8 +317,6 @@ ripari.
 
 Ĉiu ebla radikaro, kiun ni trovas, havas la saman verŝajnecon, eĉ se
 unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
-
-Radikojn, kiujn apartiĝis per „o“, ni ne povas analizi.
 
 =head1 AUTHORS
 
