@@ -36,7 +36,8 @@ our @EXPORT = qw( ŝargi_radikaron
                   ĉu_postradiko
                   forviŝi_finaĵon
                   analizi_radikojn
-                  rangi_eblan_radikaron );
+                  rangi_eblan_radikaron
+                  komputi_tipon_de_radikaron );
 
 =head1 NAME
 
@@ -432,6 +433,20 @@ sub rangi_eblan_radikaron {
     }
 
     return $hakettabelo;
+}
+
+=item B<komputi_tipon_de_radikaro($ebla_radikaro)>
+
+Redonas la tipon de la donita C<$ebla_radikaro> laŭ ĝiaj radikoj.
+
+=cut
+
+sub komputi_tipon_de_radikaro {
+    my $ebla_radikaro = shift
+        || die "Neniu radikaro dinita al „komputi_tipon_de_radikaro“";
+
+    # Mi ne certas, ĉu tiu pravas.
+    return $radikaro{$#$ebla_radikaro};
 }
 
 =back
