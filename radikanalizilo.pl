@@ -92,9 +92,32 @@ while (<>) {
     pri_helpo    if /^!h$/;
     last         if /^!e$/;
 
+    print <<'LINEFINO';
+----------------------------------------------------------------------
+LINEFINO
+
     chomp;
     my $analizo = analizi_radikojn($_);
-    say Dumper $analizo;
+    print 'Mi ricevis ';
+    if ($analizo->{'finaĵo'} eq '') {
+        print 'senfinaĵan vorton; ';
+    } else {
+        print 'vorton finiĝantan per „', $analizo->{'finaĵo'}, '“; ';
+    }
+
+    say 'mi povas analizi ĝin tiel:';
+    my $eblaj_radikaroj = $analizo->{'eblaj_radikaroj'};
+    foreach my $ebla_radikaro (@$eblaj_radikaroj) {
+        print '  - ', $ebla_radikaro->[0];
+        for (1..(scalar(@$ebla_radikaro)-1)) {
+            print ' + ', $ebla_radikaro->[$_];
+        }
+        say '';
+    }
+
+    print <<'LINEFINO';
+----------------------------------------------------------------------
+LINEFINO
 } continue {
     inviton;
 }
