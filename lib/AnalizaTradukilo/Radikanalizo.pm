@@ -35,8 +35,6 @@ our @EXPORT = qw( ŝargi_radikaron
                   forviŝi_finaĵon
                   analizi_radikojn );
 
-use Data::Dumper;
-
 =head1 NAME
 
 AnalizaTradukilo::Radikanalizo - Subrutinaro por analizi radikojn en
