@@ -92,8 +92,9 @@ while (<>) {
     pri_helpo    if /^!h$/;
     last         if /^!e$/;
 
-#    my $analizo = analizi_radikojn($_);
-#    say Dumper $analizo;
+    chomp;
+    my $analizo = analizi_radikojn($_);
+    say Dumper $analizo;
 } continue {
     inviton;
 }
