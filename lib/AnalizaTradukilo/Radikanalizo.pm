@@ -444,9 +444,6 @@ Jam sciitaj problemoj:
 radikojn, inkluzive propajn nomojn.  Mi ne certas, kiel ĉi tiun
 ripari.
 
-Ĉiu ebla radikaro, kiun ni trovas, havas la saman verŝajnecon, eĉ se
-unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
-
 Numerojn ĝi ne komprenas.  La numer-vortoj sciitas esti radikoj, sed
 la postaj radikoj „opa“, „a“, ktp ne troviĝos.
 
