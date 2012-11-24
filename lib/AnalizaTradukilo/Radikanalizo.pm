@@ -26,21 +26,21 @@ use locale ':not_characters';
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
 
-use Data::Dumper;
-
 use base 'Exporter';
 our @EXPORT = qw( ŝargi_radikaron
+                  aldoni_radikon
+                  aldoni_senfinaĵan_vorton
                   ĉu_radiko
                   ĉu_senfinaĵa_vorto
                   forviŝi_finaĵon
                   analizi_radikojn );
 
-=head1 NOMO
+=head1 NAME
 
 AnalizaTradukilo::Radikanalizo - Subrutinaro por analizi radikojn en
 vorto
 
-=head1 VERSIO
+=head1 VERSION
 
 La versio 2.0ª
 
@@ -48,7 +48,7 @@ La versio 2.0ª
 
 our $VERSION = '2.0';
 
-=head1 RESUMO
+=head1 SYNOPSIS
 
 Uzu ĉi tiun subrutinaron tiele:
 
@@ -56,21 +56,21 @@ Uzu ĉi tiun subrutinaron tiele:
     ŝargi_radikaron;
     my $analizo = analizi_radikojn("amuzo");
 
-=head1 PRISKRIBO
+=head1 DESCRIPTION
 
 Ĉi tiu subrutinaro enhavas subrutinojn, kiu helpas onin analizi la
 radikojn de vortoj Esperantaj.
 
-=head2 Subrutinoj
+=head2 Subroutines
 
 =over 4
 
 =item B<ŝargi_radikaron()>
 
-=item B<ŝargi_radikaron($file)>
+=item B<ŝargi_radikaron($dosiero)>
 
 Ŝargas iun radikar-dosieron en memorion.  Tiu for ŝargas la dosieron
-ĉe „data/radikaro“; tiu ĉi ŝargas la dosieron donitan.
+ĉe F<data/radikaro>; tiu ĉi ŝargas la C<$dosiero>n donitan.
 
 Ĉiu vico en radikar-dosiero devas havi unu el la sekvantajn formojn:
 
@@ -106,9 +106,41 @@ sub ŝargi_radikaron {
     }
 }
 
+=item B<aldoni_radikon($radiko, $tipo)>
+
+Aldonas donitan C<$radiko>n de iu C<$tipo> al la radikaron de la
+programo.  Ĉi tio lasas, ke la programo aldonu novajn vortojn
+(proprajn nomojn, ktp), pri kiujn ĝi lernas dum tradukado.
+
+=cut
+
+sub aldoni_radikon {
+    my ($radiko, $tipo) = shift
+        || die "Radiko aŭ tipo ne donita al „aldoni_radikon“";
+
+    $radikaro{$radiko} = $tipo;
+}
+
+=item B<aldoni_senfinaĵan_vorton($vorto, $tipo)>
+
+Aldonas donitan C<$vorto>n de iu C<$tipo> al kaj la radikaron kaj la
+vortaron de senfinaĵaj vortoj de la programo.  Ĉi tio lasas, ke la
+programo aldonu novajn vortojn (proprajn nomojn, ktp), pri kiujn ĝi
+lernas dum tradukado.
+
+=cut
+
+sub aldoni_senfinaĵan_vorton {
+    my ($vorto, $tipo) = shift
+        || die "Vorto aŭ tipo ne donita al „aldoni_senfinaĵan_vorton“";
+
+    $vortoj{$vorto} = undef;
+    aldoni_radikon($vorto, $tipo);
+}
+
 =item B<ĉu_radiko($kordeto)>
 
-Redonas, ĉu iu donita kordeto estas sciita radiko.
+Redonas, ĉu iu donita C<$kordeto> estas sciita radiko.
 
 =cut
 
@@ -120,7 +152,7 @@ sub ĉu_radiko {
 
 =item B<ĉu_senfinaĵa_vorto($kordeto)>
 
-Redonas, ĉu iu donita kordeto estas sciita vorto, kiu ne havas
+Redonas, ĉu iu donita C<$kordeto> estas sciita vorto, kiu ne havas
 finaĵon.
 
 =cut
@@ -133,10 +165,10 @@ sub ĉu_senfinaĵa_vorto {
 
 =item B<forviŝi_finaĵon($vorto)>
 
-Redonas strukturon, kiu enhavas la vorton sen finaĵo kaj la finaĵon.
-Se estas tia vorto, kiaj „mi“ kaj „ne“, kiu ne finiĝas per finaĵo, sed
-kies lastaj literoj estas iu finaĵo, ĉi tiu subrutino ankoraŭ agos
-tiel, kiel la vorto ja havus finaĵon.
+Redonas strukturon, kiu enhavas la C<$vorto>n sen finaĵo kaj la
+finaĵon.  Se estas tia C<$vorto>, kiaj „mi“ kaj „ne“, kiu ne finiĝas
+per finaĵo, sed kies lastaj literoj estas iu finaĵo, ĉi tiu subrutino
+ankoraŭ agos tiel, kiel la C<$vorto> ja havus finaĵon.
 
 La strukturo, kiun ĉi tiu subrutino redonas, havas la sekvantan
 formon:
@@ -174,9 +206,9 @@ sub forviŝi_finaĵon {
 
 =item B<analizi_radikojn($vorto)>
 
-Redonas strukturon, kiu enhavas la radikojn de C<$vorto>.  Se la vorto
-enhavas radikojn nesciitajn, la tutan nefinaĵan parton supozas oni
-esti radikon.
+Redonas strukturon, kiu enhavas la radikojn de C<$vorto>.  Se la
+C<$vorto> enhavas radikojn nesciitajn, la tutan nefinaĵan parton
+supozas oni esti radikon.
 
 La strukturo, kiun ĉi tiu subrutino redonas, havas la sekvantan
 formon:
@@ -261,22 +293,23 @@ sub analizi_radikojn_helpilo {
 
 =back
 
-=head1 PROBLEMOJ
+=head1 BUGS
 
 Jam sciitaj problemoj:
 
 Ĉi tiu modulo ne povas analizi vortojn, kiu enhavas nesciitajn
-radikojn, inkluzive propajn nomojn.
+radikojn, inkluzive propajn nomojn.  Mi ne certas, kiel ĉi tiun
+ripari.
 
 Ĉiu ebla radikaro, kiun ni trovas, havas la saman verŝajnecon, eĉ se
-unu estas ege pli bona ol la aliaj.
+unu estas ege pli bona ol la aliaj.  Verŝajnecoj eble estu relativaj.
 
-=head1 AŬTORO
+=head1 AUTHORS
 
 Tiun ĉi modulon skribigis Patrick M. Niedzielski
-C<PatrickNiedzielski@gmail.com>.
+C<< <PatrickNiedzielski@gmail.com> >>.
 
-=head1 KOPIRAJTO KAJ KONDIĈOJ
+=head1 COPYRIGHT AND LICENSE
 
 Copyright © 2012 Patrick M. Niedzielski.
 
