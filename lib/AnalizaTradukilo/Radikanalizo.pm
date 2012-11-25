@@ -344,7 +344,7 @@ sub analizi_radikojn_helpilo {
         push $lastaj, @$pliaj;
     }
     for $longeco (1..((length $_)-1)) {
-        next unless /^(.{$longeco})o(.*)$/;
+        next unless /^(.{$longeco})[oaei](.*)$/;
         my $trovita = $1;
         next unless ĉu_radiko($trovita);
         $pliaj = analizi_radikojn_helpilo($2);
