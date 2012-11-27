@@ -88,7 +88,7 @@ sub skribi_radikon {
     my $kordeto = $_[0];
     unless (ĉu_radiko($_[0])) {
         $kordeto .= '*';
-        push @nesciitaj_radikoj, $_[0];
+       push @nesciitaj_radikoj, $_[0];
     }
     return $kordeto;
 }

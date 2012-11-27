@@ -116,10 +116,11 @@ sub ŝargi_radikaron {
         next if /^\s*\#/;       # Komento
         next unless /^(\w+)\s+(\w+),((?:\w+,)*)$/;
         my $radiko = $1;
+        my $pri = $3;
         # Se senfinaĵa vorto:
-        $vortoj{$radiko}       = undef if $3 =~ /vorto,/;
-        $antaŭradikoj{$radiko} = undef if $3 =~ /antaŭ,/;
-        $postradikoj{$radiko}  = undef if $3 =~ /post,/;
+        $vortoj{$radiko}       = undef if $pri =~ /vorto,/;
+        $antaŭradikoj{$radiko} = undef if $pri =~ /antaŭ,/;
+        $postradikoj{$radiko}  = undef if $pri =~ /post,/;
         $radikaro{$radiko}     = $2;
     }
 }
@@ -232,6 +233,15 @@ sub forviŝi_finaĵon {
                    'e', 'en');                       # adverboj
 
     for ($vorto) {
+        # Ĉu estas „la“?
+        return ['', 'la'] if /^l(?:'|a)$/;
+
+        # Ĉu estas akuzativa pronomo?
+        return ['n', s/n$//r] if /^(?:mi|ni|ci|vi|li|ŝi|ĝi|ili|si|oni)n$/;
+
+        # Ĉu estas nominativa pronomo?
+        return ['', $_] if /^(?:mi|ni|ci|vi|li|ŝi|ĝi|ili|si|oni)$/;
+
         # Unue, ni provos, ĉu la vorto finiĝas per „'“.  Se jes,
         # redonu „o“, ne „'“.
         return ['o', s/'$//r] if /'$/;
@@ -280,7 +290,8 @@ formon:
 sub analizi_radikojn {
     my $vorto = shift
         || die "Neniu vorto donita al „analizi_radikojn“";
-    die "Nevalida vorto donita al „analizi_radikojn“" unless /[a-z]+/;
+    die "Nevalida vorto donita al „analizi_radikojn“"
+        unless $vorto =~ /[a-z]+/;
 
     my $analizo = { originala => $vorto };
 
@@ -314,15 +325,15 @@ sub analizi_radikojn {
         }
         push $analizo->{'eblaj_radikaroj'}, [$finaĵo_strukturo->[1]]
             if !$ĉu_en_listo;
-
-        # Rangi eblajn radikarojn:
-        my $radikaroj_kun_rangoj = [];
-        foreach my $ebla_radikaro (@{$analizo->{'eblaj_radikaroj'}}) {
-            push($radikaroj_kun_rangoj,
-                 rangi_eblan_radikaron($ebla_radikaro));
-        }
-        $analizo->{'eblaj_radikaroj'} = $radikaroj_kun_rangoj;
     }
+    
+    # Rangi eblajn radikarojn:
+    my $radikaroj_kun_rangoj = [];
+    foreach my $ebla_radikaro (@{$analizo->{'eblaj_radikaroj'}}) {
+        push($radikaroj_kun_rangoj,
+             rangi_eblan_radikaron($ebla_radikaro));
+    }
+    $analizo->{'eblaj_radikaroj'} = $radikaroj_kun_rangoj;
 
     return $analizo;
 }
