@@ -31,7 +31,7 @@ use AnalizaTradukilo::Frazanalizo;
 use Data::Dumper;
 
 my @vortanalizoj = ();
-foreach my $vorto (qw( la katon amas hundo )) {
+foreach my $vorto (qw( la bona kato min amas )) {
     push @vortanalizoj, analizi_radikojn($vorto);
 }
 analizi_frazon(\@vortanalizoj);

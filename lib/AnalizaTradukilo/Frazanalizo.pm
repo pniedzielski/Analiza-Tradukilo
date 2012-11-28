@@ -198,7 +198,6 @@ sub redoni_stangon {
 }
 
 
-
 =back
 
 =head1 BUGS
