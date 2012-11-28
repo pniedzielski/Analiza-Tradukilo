@@ -78,88 +78,113 @@ sub analizi_frazon {
     my $vortoj_en_frazo = shift
         || die "Neniuj vortoj donitaj al „analizi_frazon“";
 
-    my $duoblaj_stangoj = [];
+    my $arbo = [];
     for (my $i = 0; $i < scalar(@$vortoj_en_frazo); ++$i) {
         my $vorto = $vortoj_en_frazo->[$i];
         my $radikaro = trovi_radikaron_uzi($vorto);
-
+        
         if (scalar(@$radikaro) == 1 && $radikaro->[0] eq 'la') {
-            my $nova_n_duobla_stango = ['NP', ['determ', $vorto]];
-
-            # Testu la sekvan vorton: ĉu estas substantivo?
-            $vorto = $vortoj_en_frazo->[++$i];
-            $radikaro = trovi_radikaron_uzi($vorto);
-            if ($vorto->{'finaĵo'} =~ /^on?$/) {
-                push $nova_n_duobla_stango, ["N'", $vorto];
-            }
-            push $duoblaj_stangoj, $nova_n_duobla_stango;
-        } elsif ($vorto->{'finaĵo'} =~ /^on?$/) {
-            my $nova_n_duobla_stango =
-                ['NP', ["N'", $vorto]];
-            push $duoblaj_stangoj, $nova_n_duobla_stango;
+            push $arbo, nova_np($vortoj_en_frazo, $vorto, \$i);
+        } elsif ($vorto->{'finaĵo'} =~ /^[oa]n?$/) {
+            --$i;
+            push $arbo, nova_np($vortoj_en_frazo, '', \$i);
+        } elsif (ĉu_pronomo($vorto->{'originala'})) {
+            push $arbo, nova_pronoma_np($vorto);
         } elsif ($vorto->{'finaĵo'} =~ /^[aiou]s|u$/) {
             my $nova_v_duobla_stango =
-                ['VP', ["V'", $vorto]];
-            push $duoblaj_stangoj, $nova_v_duobla_stango;
-        } elsif ($vorto->{'finaĵo'} =~ /^n?$/ &&
-                 ĉu_pronomo($vorto->{'originala'})) {
-            my $nova_n_duobla_stango =
-                ['NP', ["N'", $vorto]];
-            push $duoblaj_stangoj, $nova_n_duobla_stango;
+                ['VP', ["V'", ['V', $vorto]]];
+            push $arbo, $nova_v_duobla_stango;
         }
-    }
-
-    # Se la verbo povas havi subjekton kaj objekton...
-    # TODO: ĝin provu.
-    my ($verbo, $subjekto, $objekto);
-    my ($verbo_loko, $subjekto_loko, $objekto_loko) = (0, 0, 0);
-    for (my $j = 0; $j < scalar(@$duoblaj_stangoj); ++$j) {
-        for ($duoblaj_stangoj->[$j]) {
-            if (ĉu_havas_stangon($_)) {
-                my $stango = redoni_stangon($_);
-                if ($stango->[0] eq "V'") {
-                    $verbo = $_;
-                    $verbo_loko = $j;
-                } elsif ($stango->[0] eq "N'") {
-                    if ($stango->[1]->{'finaĵo'} eq 'o' ||
-                        ($stango->[1]->{'finaĵo'} eq '' &&
-                         ĉu_pronomo($stango->[1]->{'originala'}))) {
-                        $subjekto = $_;
-                        $subjekto_loko = $j;
-                    } else {
-                        $objekto = $_;
-                        $objekto_loko = $j;
-                    }
-                }
-            }
-        }
-    }
-    if (defined $verbo and defined $subjekto) {
-        splice @$verbo, 1, 0, $subjekto;
-        splice @$duoblaj_stangoj, $subjekto_loko, 1;
-        --$objekto_loko if $objekto_loko > $subjekto_loko;
-    }
-    if (defined $verbo and defined $objekto) {
-        push $verbo, $objekto;
-        splice @$duoblaj_stangoj, $objekto_loko, 1;
-        --$subjekto_loko if $subjekto_loko > $objekto_loko;
     }
     
-    say Dumper $duoblaj_stangoj;
+    return $arbo;
 }
 
-sub ĉu_havas_subjekton {
-    for ($_[0]) {
-        return 1 if $_->[1]->[0] eq "N'";
-        return 0;
+sub nova_pronoma_np {
+    my $pronomo = shift
+        || die;
+    
+    return ['NP', ["N'", ['N', $pronomo]]];
+}
+
+sub nova_np {
+    my $vortoj_en_frazo = shift
+        || die;
+    my $spec = shift;
+    my $i = shift;
+
+    my $np = ['NP', ["N'"]];
+    $np = ['NP', ['SPEC', $spec], ["N'"]] if defined $spec && $spec ne '';
+
+    my $ĉu_akuzativa = -1; # nesciita
+    my $akuzativa_regex = 'n?';
+    while (1) {
+        last unless defined $vortoj_en_frazo->[++$$i];
+        my $vorto = $vortoj_en_frazo->[$$i];
+        if ($ĉu_akuzativa == 1) {
+            $akuzativa_regex = 'n';
+        } elsif ($ĉu_akuzativa == 0) {
+            $akuzativa_regex = '';
+        }
+        if ($vorto->{'finaĵo'} =~ /^o$akuzativa_regex$/) {
+            my $n_stango = redoni_plej_profundan_x_stangon($np);
+            push $n_stango, ['N', $vorto];
+            
+            $ĉu_akuzativa = 0;
+            $ĉu_akuzativa = 1 if ($vorto->{'finaĵo'} =~ /n$/);
+        } elsif ($vorto->{'finaĵo'} =~ /^a$akuzativa_regex$/) {
+            aldoni_komplementon($np, ['COMP', ['AP', ["A'", ['A', $vorto]]]]);
+            
+            $ĉu_akuzativa = 0;
+            $ĉu_akuzativa = 1 if ($vorto->{'finaĵo'} =~ /n$/);
+        } else {
+            --$$i;
+            last;
+        }
+    }
+    return $np;
+}
+
+sub aldoni_komplementon {
+    my $x_duobla_stango = shift
+        || die "Neniu XP donita al „aldoni_komplementon“";
+    my $komplementon = shift
+        || die "Neniu komplemento donita al „aldoni_komplementon“";
+
+    # Kio estas la X?
+    my $tipo = substr($x_duobla_stango->[0], 0, 1);
+
+    my $plej_profunda_x_stango =
+        redoni_plej_profundan_x_stangon($x_duobla_stango);
+
+    # Se elemento -1a estas X, ...; alie, ...
+    if (scalar(@$plej_profunda_x_stango) != 1) {
+        if (ref $plej_profunda_x_stango->[-1] eq 'ARRAY' &&
+            $plej_profunda_x_stango->[-1][0] =~ /^$tipo$/) {
+            splice @$plej_profunda_x_stango, -1, 0, $komplementon;
+        } else {
+            push @$plej_profunda_x_stango, $komplementon;
+        }
+    } else {
+        push @$plej_profunda_x_stango, $komplementon;
     }
 }
 
-sub ĉu_havas_objekton {
-    for ($_[0]) {
-        my $lasta = scalar(@$_)-1;
-        return 1 if $_->[$lasta]->[0] eq "N'";
-        return 0;
+sub redoni_plej_profundan_x_stangon {
+    my $x_duobla_stango = shift
+        || die "Neniu XP donita al „redoni_plej_profundan_x_stangon“";
+
+    # Kio estas la X?
+    my $tipo = substr($x_duobla_stango->[0], 0, 1);
+    
+    my $pleja;
+    for $pleja (@$x_duobla_stango) {
+        next unless ref $pleja eq 'ARRAY';
+        if ($pleja->[0] =~ /^$tipo'$/) {
+            my $nova_pleja = redoni_plej_profundan_x_stangon($pleja);
+            $pleja = $nova_pleja if ref $nova_pleja eq 'ARRAY';
+            return $pleja;
+        }
     }
 }
 
@@ -179,22 +204,6 @@ sub trovi_radikaron_uzi {
         }
     }
     return $radikaro;
-}
-
-sub ĉu_havas_stangon {
-    my $tipo = substr($_[0]->[0], 0, 1);
-    for (1..(scalar(@{$_[0]})-1)) {
-        return 1 if ($_[0]->[$_]->[0] eq $tipo."'");
-    }
-    return 0;
-}
-
-sub redoni_stangon {
-    my $tipo = substr($_[0]->[0], 0, 1);
-    for (1..(scalar(@{$_[0]})-1)) {
-        return $_[0]->[$_] if ($_[0]->[$_]->[0] eq $tipo."'");
-    }
-    return undef;
 }
 
 

@@ -28,12 +28,13 @@ use lib "./lib";
 use AnalizaTradukilo::Radikanalizo;
 use AnalizaTradukilo::Frazanalizo;
 
-use Data::Dumper;
+use Data::Dumper::Perltidy;
+$Data::Dumper::Perltidy::ARGV = '-pbp -nst';
 
 my @vortanalizoj = ();
-foreach my $vorto (qw( la bona kato min amas )) {
+foreach my $vorto (qw( la proprita amita kato granda estis feliĉa )) {
     push @vortanalizoj, analizi_radikojn($vorto);
 }
-analizi_frazon(\@vortanalizoj);
+say Dumper analizi_frazon(\@vortanalizoj);
 
 __END__
