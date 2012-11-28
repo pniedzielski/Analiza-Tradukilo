@@ -3067,8 +3067,8 @@ ej	substantiva,post,
 ek	adverba,antaŭ,
 em	adjektiva,post,
 end	adjektiva,post,
-er	substantiva,post
-estr	substantiva,post
+er	substantiva,post,
+estr	substantiva,post,
 et	adjektiva,post,
 ge	adjektiva,antaŭ,
 id	substantiva,post,
@@ -3088,3 +3088,5 @@ ul	substantiva,post,
 um	substantiva,post,
 
 la	substantiva,vorto,
+
+nova	substantiva,
