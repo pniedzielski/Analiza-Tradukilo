@@ -31,8 +31,10 @@ use AnalizaTradukilo::Frazanalizo;
 use Data::Dumper::Perltidy;
 $Data::Dumper::Perltidy::ARGV = '-pbp -nst';
 
+ŝargi_radikaron;
+
 my @vortanalizoj = ();
-foreach my $vorto (qw( la proprita amita kato granda estis feliĉa )) {
+foreach my $vorto (qw( la proprita amita kato granda de mia frato estis feliĉa )) {
     push @vortanalizoj, analizi_radikojn($vorto);
 }
 say Dumper analizi_frazon(\@vortanalizoj);

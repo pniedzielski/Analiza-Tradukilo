@@ -29,8 +29,6 @@ binmode STDERR, ":utf8";
 use base 'Exporter';
 our @EXPORT = qw( analizi_frazon );
 
-use Data::Dumper;
-
 =head1 NAME
 
 AnalizaTradukilo::Frazanalizo - Subrutinaro por analizi frazojn.
@@ -67,7 +65,7 @@ gramatikon de Esperanta frazo.
 
 =item B<analizi_frazon($vortoj_en_frazo)>
 
-Analizas frazon.
+Analizas frazon per la vortoj en la frazo.
 
 Ĉi tiu subrutino funkcias per „X' teorio“ („Ikso-stango teorio“,
 laŭangle „X-bar theory“).
@@ -81,9 +79,7 @@ sub analizi_frazon {
     my $arbo = [];
     for (my $i = 0; $i < scalar(@$vortoj_en_frazo); ++$i) {
         my $vorto = $vortoj_en_frazo->[$i];
-        my $radikaro = trovi_radikaron_uzi($vorto);
-        
-        if (scalar(@$radikaro) == 1 && $radikaro->[0] eq 'la') {
+        if (ĉu_artikolo($vorto)) {
             push $arbo, nova_np($vortoj_en_frazo, $vorto, \$i);
         } elsif ($vorto->{'finaĵo'} =~ /^[oa]n?$/) {
             --$i;
@@ -137,12 +133,42 @@ sub nova_np {
             
             $ĉu_akuzativa = 0;
             $ĉu_akuzativa = 1 if ($vorto->{'finaĵo'} =~ /n$/);
+        } elsif ($vorto->{'originala'} eq 'de') {
+            my $adjunkto = ["N'", $np->[-1],
+                            ['ADJ', nova_pp($vortoj_en_frazo, $vorto, $i)]];
+            $np->[-1] = $adjunkto;
+            last;
         } else {
             --$$i;
             last;
         }
     }
     return $np;
+}
+
+sub nova_pp {
+    my $vortoj_en_frazo = shift
+        || die "Neniuj vortoj donitaj al „nova_pp“";
+    my $prepozicio = shift
+        || die "Neniu prepozicio donita al „nova_pp“";
+    my $i = shift
+        || die "Neniu loko donita al „nova_pp“";
+
+    my $pp = ['PP', ["P'", ['P', $prepozicio]]];
+
+    my $vorto = @$vortoj_en_frazo[++$$i];
+    my $artikolo;
+    $artikolo = $vorto if ĉu_artikolo($vorto);
+    --$$i if !defined $artikolo;
+    push $pp->[1], ['COMP', nova_np($vortoj_en_frazo, $artikolo, $i)];
+
+    return $pp;
+}
+
+sub ĉu_artikolo{
+    my $radikaro = trovi_radikaron_uzi($_[0]);
+    return 1 if (scalar(@$radikaro) == 1 && $radikaro->[0] eq 'la');
+    return 0;
 }
 
 sub aldoni_komplementon {
