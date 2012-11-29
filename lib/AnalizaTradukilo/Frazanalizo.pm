@@ -35,7 +35,7 @@ AnalizaTradukilo::Frazanalizo - Subrutinaro por analizi frazojn.
 
 =head1 VERSION
 
-La versio 2.0ª
+La versio 1.0ª
 
 =cut
 
