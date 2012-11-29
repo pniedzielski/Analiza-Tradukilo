@@ -81,7 +81,7 @@ sub analizi_frazon {
         my $vorto = $vortoj_en_frazo->[$i];
         if (ĉu_artikolo($vorto)) {
             push $arbo, nova_np($vortoj_en_frazo, $vorto, \$i);
-        } elsif ($vorto->{'finaĵo'} =~ /^[oa]n?$/) {
+        } elsif ($vorto->{'finaĵo'} =~ /^[oa]j?n?$/) {
             --$i;
             push $arbo, nova_np($vortoj_en_frazo, '', \$i);
         } elsif (ĉu_pronomo($vorto->{'originala'})) {
@@ -122,7 +122,7 @@ sub nova_np {
         } elsif ($ĉu_akuzativa == 0) {
             $akuzativa_regex = '';
         }
-        if ($vorto->{'finaĵo'} =~ /^o$akuzativa_regex$/) {
+        if ($vorto->{'finaĵo'} =~ /^oj?$akuzativa_regex$/) {
             my $n_stango = redoni_plej_profundan_x_stangon($np);
             push $n_stango, ['N', $vorto];
             
