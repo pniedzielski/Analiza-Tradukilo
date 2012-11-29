@@ -62,7 +62,7 @@ Uzu ĉi tiun subrutinaron tiele:
 
 =head1 DESCRIPTION
 
-Ĉi tiu subrutinaro enhavas subrutinojn, kiu helpas onin analizi la
+Ĉi tiu subrutinaro enhavas subrutinojn, kiuj helpas onin analizi la
 radikojn de vortoj Esperantaj.
 
 =head2 Subroutines

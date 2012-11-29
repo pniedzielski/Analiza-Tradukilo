@@ -56,7 +56,7 @@ Uzu ĉi tiun subrutinaron tiele:
 
 =head1 DESCRIPTION
 
-Ĉi tiu subrutinaro enhavas subrutinojn, kiu helpas onin analizi
+Ĉi tiu subrutinaro enhavas subrutinojn, kiuj helpas onin analizi
 gramatikon de Esperanta frazo.
 
 =head2 Subroutines
